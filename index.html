@@ -9,9 +9,9 @@
     </style>
 </head>
 <body>
-    <div id="search">
+    <div id="srchelem">
         <label for="search">Search for a city...</label>
-        <input type="search" id="search" name="q" />
+        <input type="search" id="search" name="search"/>
         <button class="go">Search</button>
     </div>
 </body>
@@ -81,8 +81,10 @@ let weatherapi;
 
 
 go.addEventListener('click', async () => {
+    console.log(searchInput.value);
     geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
-    await getGeo();
+    console.log(geoapi);
+    getGeo();
 });
 
 async function getGeo() {
@@ -90,7 +92,7 @@ async function getGeo() {
     const location = await answ.json();
     lat = location.results[0].latitude;
     long = location.results[0].longitude;
-    await getWeather();
+    getWeather();
 }
 
 
@@ -107,7 +109,7 @@ async function getWeather() {
     winddir = forecast.hourly.wind_direction_10m[7]; 
     windspeed = forecast.hourly.wind_speed_10m[7]; 
     humid = forecast.hourly.relative_humidity_2m[7];
-    alert(`Weather Code: ${wcode} (${wmodict[wcode]})
+    alert(`Weather: (${wmodict[wcode]})
     Precipitation Probability: ${percprob}%`)
     
 }
