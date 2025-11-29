@@ -9,11 +9,107 @@
     </style>
 </head>
 <body>
-    
+    <div id="search">
+        <label for="search">Search for a city...</label>
+        <input type="search" id="search" name="q" />
+        <button class="go">Search</button>
+    </div>
 </body>
 <script>
-const geoapi = "https://geocoding-api.open-meteo.com/v1/search?name=Berlin&count=1&language=en&format=json";
-const weatherapi = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=precipitation_probability,precipitation,wind_speed_120m,wind_direction_120m,temperature_120m&forecast_days=1"
+/*
+WMO Weather interpretation codes (WW)
+Code Description
+0 Clear sky
+1, 2, 3 Mainly clear, partly cloudy, and overcast
+45, 48 Fog and depositing rime fog
+51, 53, 55 Drizzle: Light, moderate, and dense intensity
+56, 57 Freezing Drizzle: Light and dense intensity
+61, 63, 65 Rain: Slight, moderate and heavy intensity
+66, 67 Freezing Rain: Light and heavy intensity
+71, 73, 75 Snow fall: Slight, moderate, and heavy intensity
+77 Snow grains
+80, 81, 82 Rain showers: Slight, moderate, and violent
+85, 86 Snow showers slight and heavy
+95 * Thunderstorm: Slight or moderate
+96, 99 * Thunderstorm with slight and heavy hail
+*/
+const searchInput = document.querySelector('#search');
+const go = document.querySelector('.go');
+const wmodict = {
+  0: "Clear Sky",
+  1: "Mainly Clear",
+  2: "Partly Cloudy",
+  3: "Overcast",
+  45: "Fog",
+  48: "Depositing Rime Fog",
+  51: "Light Drizzle",
+  53: "Moderate Drizzle",
+  55: "Dense Drizzle",
+  56: "Light Freezing Drizzle",
+  57: "Dense Freezing Drizzle",
+  61: "Slight Rain",
+  63: "Moderate Rain",
+  65: "Heavy Rain",
+  66: "Light Freezing Rain",
+  67: "Heavy Freezing Rain",
+  71: "Slight Snowfall",
+  73: "Moderate Snowfall",
+  75: "Heavy Snowfall",
+  77: "Snow Grains",
+  80: "Slight Rain Showers",
+  81: "Moderate Rain Showers",
+  82: "Violent Rain Showers",
+  85: "Slight Snow Showers",
+  86: "Heavy Snow Showers",
+  95: "Slight Or Moderate Thunderstorm",
+  96: "Thunderstorm With Slight Hail",
+  99: "Thunderstorm With Heavy Hail"
+};
+let lat;
+let long;
+let wcode; 
+let percprob; 
+let percsize; 
+let tempfeel; 
+let temp; 
+let vis; 
+let winddir; 
+let windspeed; 
+let humid;
+let geoapi;
+let weatherapi;
 
+
+go.addEventListener('click', async () => {
+    geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
+    await getGeo();
+});
+
+async function getGeo() {
+    const answ = await fetch(geoapi);
+    const location = await answ.json();
+    lat = location.results[0].latitude;
+    long = location.results[0].longitude;
+    await getWeather();
+}
+
+
+async function getWeather() {
+    weatherapi = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=precipitation_probability,precipitation,weather_code,apparent_temperature,visibility,wind_direction_10m,wind_speed_10m,temperature_2m,relative_humidity_2m&timezone=auto&forecast_days=1`;
+    const answ = await fetch(weatherapi);
+    const forecast = await answ.json();
+    wcode = forecast.hourly.weather_code[7]; // fetching each value at 8am
+    percprob = forecast.hourly.precipitation_probability[7];
+    percsize = forecast.hourly.precipitation[7]; 
+    tempfeel = forecast.hourly.apparent_temperature[7]; 
+    temp = forecast.hourly.temperature_2m[7]; 
+    vis = forecast.hourly.visibility[7]; 
+    winddir = forecast.hourly.wind_direction_10m[7]; 
+    windspeed = forecast.hourly.wind_speed_10m[7]; 
+    humid = forecast.hourly.relative_humidity_2m[7];
+    alert(`Weather Code: ${wcode} (${wmodict[wcode]})
+    Precipitation Probability: ${percprob}%`)
+    
+}
 </script>
 </html>
