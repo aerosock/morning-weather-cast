@@ -4,15 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <style>
+
+    body{
+        background-color: #494949;
+        color: white;
+    }
+    #srchelem{
+        margin: 50vh 3rem auto 2rem;
+    }
 
     </style>
 </head>
 <body>
-    <div id="srchelem">
-        <label for="search">Search for a city...</label>
-        <input type="search" id="search" name="search"/>
-        <button class="go">Search</button>
+    <div id="rowgroup">
+        <div id="srchelem">
+            <label for="search">Search for a city...</label>
+            <input type="search" id="search" name="search"/>
+            <!-- <button class="go">Search</button> -->
+        </div>
+        <div id="resultwrapper">
+            <img id="weather-icon" src="icons/0.png" alt="Weather icon">
+        </div>
     </div>
 </body>
 <script>
@@ -78,14 +93,27 @@ let windspeed;
 let humid;
 let geoapi;
 let weatherapi;
+// $(".go").click(async function(){
+//     Search();
+// });
 
+$(document).on('keydown', function (e) {
+  if (e.key === 'Enter') {
+    Search();
+  }
+});
 
-go.addEventListener('click', async () => {
+$("input").blur(function(){
+  Search();
+});
+
+function Search(){
     console.log(searchInput.value);
     geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
     console.log(geoapi);
     getGeo();
-});
+}
+
 
 async function getGeo() {
     const answ = await fetch(geoapi);
@@ -109,9 +137,67 @@ async function getWeather() {
     winddir = forecast.hourly.wind_direction_10m[7]; 
     windspeed = forecast.hourly.wind_speed_10m[7]; 
     humid = forecast.hourly.relative_humidity_2m[7];
-    alert(`Weather: (${wmodict[wcode]})
+    console.log(`Weather: ${wmodict[wcode]}
     Precipitation Probability: ${percprob}%`)
-    
+    Display();
+}
+function Display(){
+    if (wcode == 0) {
+        iconname = "icons/0.png";
+    } 
+    else if (wcode == 1 || wcode == 2) {
+        iconname = "icons/1,2.png";
+    }
+    else if (wcode == 3) {
+        iconname = "icons/3.png";
+    }
+    else if (wcode == 45 || wcode == 48) {
+        iconname = "icons/45,48.png";
+    }
+    else if (wcode == 51 || wcode == 53 || wcode == 55) {
+        iconname = "icons/51,53,55.png";
+    }
+    else if (wcode == 56 || wcode == 57) {
+        iconname = "icons/56,57.png";
+    }
+    else if (wcode == 61 || wcode == 63 || wcode == 65) {
+        iconname = "icons/61,63,65.png";
+    }
+    else if (wcode == 66 || wcode == 67) {
+        iconname = "icons/66,67.png";
+    }
+    else if (wcode == 71 || wcode == 73 || wcode == 75) {
+        iconname = "icons/71,73,75.png";
+    }
+    else if (wcode == 77) {
+        iconname = "icons/77.png";
+    }
+    else if (wcode == 80 || wcode == 81 || wcode == 82) {
+        iconname = "icons/80,81,82.png";
+    }
+    else if (wcode == 85 || wcode == 86) {
+        iconname = "icons/85,86.png";
+    }
+    else if (wcode == 95) {
+        iconname = "icons/95.png";
+    }
+    else if (wcode == 96 || wcode == 99) {
+        iconname = "icons/96,99.png";
+    }
+
+    $('#weather-icon').attr('src', iconname);
+    const resultwrapper = document.querySelector('#resultwrapper');
+    resultwrapper.innerHTML = `
+    <h2>Weather in ${searchInput.value} at 8 AM</h2>
+    <img id="weather-icon" src="icons/${wcode}.png" alt="Weather icon">
+    <p><strong>Condition:</strong> ${wmodict[wcode]}</p>
+    <p><strong>Temperature:</strong> ${temp}°C (Feels like ${tempfeel}°C)</p>
+    <p><strong>Precipitation Probability:</strong> ${percprob}%</p>
+    <p><strong>Precipitation Amount:</strong> ${percsize} mm</p>
+    <p><strong>Visibility:</strong> ${vis} meters</p>
+    <p><strong>Wind:</strong> ${windspeed} km/h at ${winddir}°</p>
+    <p><strong>Humidity:</strong> ${humid}%</p>
+    `;
 }
 </script>
 </html>
