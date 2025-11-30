@@ -5,28 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+   
 
     <style>
 
     body{
-        background-color: #494949;
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #383838;
         color: white;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
     }
     #srchelem{
-        margin: 50vh 3rem auto 2rem;
+        width: 30vw;
+        margin: 0 3rem 0 4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    #resultwrapper{
+        width: 60vw;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+    #rowgroup{
+        height: 100vh;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    #weather-icon{
+        width: 20rem;
+        
+    }
+    #weatherntemp{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    #divider{
+        margin: 0 2rem;
     }
 
+    #srchelem label, #search{
+        font-size: 2.5rem;
+        color:rgb(151, 151, 151);
+        width: 100%;
+    }
+
+    #search{
+        background-color: transparent;
+        border: none;
+        border-bottom: 0.2rem solid rgb(255, 231, 48);
+        outline: none;
+        color:white;
+        text-transform: uppercase;
+    }
+    #windnhumi{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
     </style>
 </head>
 <body>
     <div id="rowgroup">
         <div id="srchelem">
-            <label for="search">Search for a city...</label>
-            <input type="search" id="search" name="search"/>
+            <label id="label1" for="search">Weather at 8AM in...</label>
+            <input type="text" id="search" name="text"/>
             <!-- <button class="go">Search</button> -->
         </div>
-        <div id="resultwrapper">
+        <div style="display: none;" id="resultwrapper">
+            <h2 style="color: rgb(255, 231, 48); margin: none;" id="cityname"></h2>
             <img id="weather-icon" src="icons/0.png" alt="Weather icon">
+            <div id="weatherntemp">
+                <h1 id="temp"></h1>
+                <h1 id="scale"></h1>
+                <h1 id="divider">|</h1>
+                <h1 id="weather"></h1>
+            </div>
+            <div id="windnhumi">
+                <h2 id="wind"></h2>
+                <img id="windicon" src="icons/winddir.png" alt="Wind direction icon"  style="width: 2rem; vertical-align: middle; margin-right: 2rem;">
+                <h2 id="humidity"></h2>
+                <img src="icons/drop.png" alt="Humidity icon" style="width: 2rem; vertical-align: middle;">
+            </div>
         </div>
     </div>
 </body>
@@ -48,6 +119,8 @@ Code Description
 95 * Thunderstorm: Slight or moderate
 96, 99 * Thunderstorm with slight and heavy hail
 */
+let morntime = 7;
+const cityname = document.querySelector('#cityname');
 const searchInput = document.querySelector('#search');
 const go = document.querySelector('.go');
 const wmodict = {
@@ -154,50 +227,76 @@ function Display(){
     else if (wcode == 45 || wcode == 48) {
         iconname = "icons/45,48.png";
     }
-    else if (wcode == 51 || wcode == 53 || wcode == 55) {
-        iconname = "icons/51,53,55.png";
+    else if (wcode == 51 || wcode == 53 || wcode == 55 || wcode == 56 || wcode == 57) {
+        iconname = "icons/51,53,55,56,57.png";
     }
-    else if (wcode == 56 || wcode == 57) {
-        iconname = "icons/56,57.png";
+    else if (wcode == 61 || wcode == 63 || wcode == 65 || wcode == 66 || wcode == 67 || wcode == 80 || wcode == 81 || wcode == 82) {
+        iconname = "icons/61,63,65,66,67,80,81,82.png";
     }
-    else if (wcode == 61 || wcode == 63 || wcode == 65) {
-        iconname = "icons/61,63,65.png";
+
+    else if (wcode == 71 || wcode == 73 || wcode == 75 || wcode == 77 || wcode == 85 || wcode == 86) {
+        iconname = "icons/71,73,75,77,85,86.png";
     }
-    else if (wcode == 66 || wcode == 67) {
-        iconname = "icons/66,67.png";
-    }
-    else if (wcode == 71 || wcode == 73 || wcode == 75) {
-        iconname = "icons/71,73,75.png";
-    }
-    else if (wcode == 77) {
-        iconname = "icons/77.png";
-    }
-    else if (wcode == 80 || wcode == 81 || wcode == 82) {
-        iconname = "icons/80,81,82.png";
-    }
-    else if (wcode == 85 || wcode == 86) {
-        iconname = "icons/85,86.png";
-    }
-    else if (wcode == 95) {
-        iconname = "icons/95.png";
-    }
-    else if (wcode == 96 || wcode == 99) {
-        iconname = "icons/96,99.png";
+    
+    else if (wcode == 95 || wcode == 96 || wcode == 99) {
+        iconname = "icons/95,96,99.png";
     }
 
     $('#weather-icon').attr('src', iconname);
     const resultwrapper = document.querySelector('#resultwrapper');
-    resultwrapper.innerHTML = `
-    <h2>Weather in ${searchInput.value} at 8 AM</h2>
-    <img id="weather-icon" src="icons/${wcode}.png" alt="Weather icon">
-    <p><strong>Condition:</strong> ${wmodict[wcode]}</p>
-    <p><strong>Temperature:</strong> ${temp}°C (Feels like ${tempfeel}°C)</p>
-    <p><strong>Precipitation Probability:</strong> ${percprob}%</p>
-    <p><strong>Precipitation Amount:</strong> ${percsize} mm</p>
-    <p><strong>Visibility:</strong> ${vis} meters</p>
-    <p><strong>Wind:</strong> ${windspeed} km/h at ${winddir}°</p>
-    <p><strong>Humidity:</strong> ${humid}%</p>
-    `;
+    const weather = document.querySelector('#weather');
+    const tempdisplay = document.querySelector('#temp');
+    const scale = document.querySelector('#scale');
+    tempdisplay.textContent = `${temp}°`;
+    scale.textContent = "C";
+    $("#scale").click(function(){
+        if (scale.textContent === "C") {
+            let tempf = (temp * 9/5) + 32;
+            tempdisplay.textContent = `${tempf.toFixed(1)}°`;
+            scale.textContent = "F";
+        } else {
+            tempdisplay.textContent = `${temp}°`;
+            scale.textContent = "C";
+        }
+    });
+    weather.textContent = wmodict[wcode];
+    cityname.textContent = searchInput.value[0].toUpperCase() + searchInput.value.slice(1);
+    resultwrapper.style.display = "flex";
+    const wind = document.querySelector('#wind');
+    wind.textContent = `${windspeed} km/h`;
+    
+    // windicon.style.transform = `rotate(${winddir+720}deg)`;
+    Windmove();
+    const humidity = document.querySelector('#humidity');
+    humidity.textContent = `${humid}%`;
+    // resultwrapper.innerHTML = `
+    // <h2>Weather in ${searchInput.value} at 8 AM</h2>
+    // <img id="weather-icon" src="icons/${wcode}.png" alt="Weather icon">
+    // <p><strong>Condition:</strong> ${wmodict[wcode]}</p>
+    // <p><strong>Temperature:</strong> ${temp}°C (Feels like ${tempfeel}°C)</p>
+    // <p><strong>Precipitation Probability:</strong> ${percprob}%</p>
+    // <p><strong>Precipitation Amount:</strong> ${percsize} mm</p>
+    // <p><strong>Visibility:</strong> ${vis} meters</p>
+    // <p><strong>Wind:</strong> ${windspeed} km/h at ${winddir}°</p>
+    // <p><strong>Humidity:</strong> ${humid}%</p>
+    // `;
+    var lastpos = 0;
+    function Windmove() {
+  let id = null;
+  const windicon = document.querySelector('#windicon');
+  let pos = 0;
+  lastpos = winddir;
+  clearInterval(id);
+  id = setInterval(frame, 3);
+  function frame() {
+    if (pos == winddir) {
+      clearInterval(id);
+    } else {
+      pos++;
+      windicon.style.transform = `rotate(${pos}deg)`;
+    }
+  }
+}
 }
 </script>
 </html>
