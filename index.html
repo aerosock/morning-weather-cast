@@ -53,7 +53,7 @@
         margin: 0 2rem;
     }
 
-    #srchelem label, #search{
+    #srchelem p, #search{
         font-size: 2.5rem;
         color:rgb(151, 151, 151);
         width: 100%;
@@ -74,13 +74,39 @@
         justify-content: center;
         gap: 0.5rem;
     }
+    .slider{
+        width: 8rem;
+
+    }
+    #timeslidercontainer{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .scale:hover{
+        color:grey;
+        cursor: pointer;
+        
+    }
+    #windicon:hover{
+        content: "";
+    }
     </style>
 </head>
 <body>
     <div id="rowgroup">
         <div id="srchelem">
-            <label id="label1" for="search">Weather at 8AM in...</label>
+
+            <p class="label1">Weather at </p>
+            <div id="timeslidercontainer">
+            <p class="label1">8AM</p>
+            <input type="range" min="5" max="10" value="7" class="slider" id="myRange">
+            </div>
+            <p class="label1">in...</p>
             <input type="text" id="search" name="text"/>
+
             <!-- <button class="go">Search</button> -->
         </div>
         <div style="display: none;" id="resultwrapper">
@@ -88,7 +114,7 @@
             <img id="weather-icon" src="icons/0.png" alt="Weather icon">
             <div id="weatherntemp">
                 <h1 id="temp"></h1>
-                <h1 id="scale"></h1>
+                <h1 class="scale" id="scale"></h1>
                 <h1 id="divider">|</h1>
                 <h1 id="weather"></h1>
             </div>
@@ -180,6 +206,20 @@ $("input").blur(function(){
   Search();
 });
 
+$("#search").focus(function(){
+    $(this).val("");
+})
+$(".slider").on("input", function() {
+    morntime = this.value;
+    console.log(morntime);
+    const times = ["5AM", "6AM", "7AM", "8AM", "9AM", "10AM"];
+    const timeLabelElements = document.querySelectorAll("#timeslidercontainer .label1");
+    timeLabelElements[0].textContent = times[morntime - 5];
+    timeLabelElements[1].textContent = times[morntime - 5];
+    if (searchInput.value !== "") {
+        Search();
+    }
+});
 function Search(){
     console.log(searchInput.value);
     geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
@@ -198,8 +238,10 @@ async function getGeo() {
 
 
 async function getWeather() {
+    // let file = "abc.json"
     weatherapi = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=precipitation_probability,precipitation,weather_code,apparent_temperature,visibility,wind_direction_10m,wind_speed_10m,temperature_2m,relative_humidity_2m&timezone=auto&forecast_days=1`;
     const answ = await fetch(weatherapi);
+    // const answ = await fetch(file);
     const forecast = await answ.json();
     wcode = forecast.hourly.weather_code[7]; // fetching each value at 8am
     percprob = forecast.hourly.precipitation_probability[7];
@@ -249,7 +291,8 @@ function Display(){
     const scale = document.querySelector('#scale');
     tempdisplay.textContent = `${temp}°`;
     scale.textContent = "C";
-    $("#scale").click(function(){
+    $(".scale").click(function(){
+        console.log(scale.textContent)
         if (scale.textContent === "C") {
             let tempf = (temp * 9/5) + 32;
             tempdisplay.textContent = `${tempf.toFixed(1)}°`;
@@ -259,6 +302,10 @@ function Display(){
             scale.textContent = "C";
         }
     });
+    // const diricon = document.querySelector('#windicon');
+    // $("#windicon").hover(function(){
+
+    // })
     weather.textContent = wmodict[wcode];
     cityname.textContent = searchInput.value[0].toUpperCase() + searchInput.value.slice(1);
     resultwrapper.style.display = "flex";
@@ -282,18 +329,20 @@ function Display(){
     // `;
     var lastpos = 0;
     function Windmove() {
+    console.log(winddir);
   let id = null;
   const windicon = document.querySelector('#windicon');
   let pos = 0;
   lastpos = winddir;
   clearInterval(id);
   id = setInterval(frame, 3);
+  windicon.style.transform = `rotate(${pos-lastpos}deg)`;
   function frame() {
     if (pos == winddir) {
       clearInterval(id);
     } else {
       pos++;
-      windicon.style.transform = `rotate(${pos}deg)`;
+      windicon.style.transform = `rotate(${pos-lastpos}deg)`;
     }
   }
 }
