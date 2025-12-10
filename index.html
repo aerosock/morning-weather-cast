@@ -2,11 +2,45 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Weather App</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
         <style>
+            @media (max-width: 599px) {
+                #rowgroup {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column !important;
+                    align-items: center;
+                    justify-content: flex-start;
+                }
+                #srchelem {
+                    width: 90%;
+                    margin: 0 3rem 0 3rem;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    justify-content: center;
+                    text-align: center;
+                }
+                #search {
+                    background-color: transparent;
+                    border: none;
+                    border-bottom: 0.2rem solid rgb(255, 231, 48);
+                    outline: none;
+                    color: white;
+                    text-transform: uppercase;
+                    text-align: center;
+            }
+                #resultwrapper {
+                    width: 80vw;
+                    align-items: center;
+                    display: flex;
+                    flex-direction: column;
+                }
+            }
+        
             body {
                 font-family: Arial, Helvetica, sans-serif;
                 background-color: #383838;
@@ -14,30 +48,38 @@
                 margin: 0;
                 padding: 0;
                 height: 100%;
-                overflow: hidden;
+                overflow-x: hidden;
             }
-            #srchelem {
-                width: 30vw;
-                margin: 0 3rem 0 4rem;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: center;
-            }
-            #resultwrapper {
-                width: 60vw;
-                align-items: center;
-                display: flex;
-                flex-direction: column;
-            }
-            #rowgroup {
-                height: 100vh;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
+
+
+            @media (min-width: 600px) {
+                #srchelem {
+                    width: 30vw;
+                    margin: 0 3rem 0 4rem;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    justify-content: center;
+                }   
+                #rowgroup {
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: flex-start;
+                }
+                #resultwrapper {
+                    width: 60vw;
+                    align-items: center;
+                    display: flex;
+                    flex-direction: column;
+                }
+                #timeslidercontainer {
+                    align-self: flex-start !important;
+                }
             }
             #weather-icon {
+                margin-top: 2rem;
                 width: 20rem;
             }
             #weatherntemp {
@@ -69,18 +111,30 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                justify-content: center;
+                justify-content: flex-start; 
                 gap: 0.5rem;
+                
+            }
+            p{
+                margin:1.5rem;
+            }
+
+            #wind {
+                min-width: 7rem;             
+                text-align: center;
             }
             .slider {
+                height: 1.28rem;
                 width: 8rem;
+                background-color:#979797;
             }
             #timeslidercontainer {
+                align-self: center;
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 gap: 1rem;
-                margin: 1rem 0;
+                
             }
             .scale:hover {
                 color: grey;
@@ -89,6 +143,37 @@
 
             #windicon:hover {
                 content: "";
+            }
+            #time{
+                display: inline-block;
+                width: 4ch !important;
+                margin-right: 1rem;
+               
+            }
+            #myRange::-moz-range-track {
+                -webkit-appearance: none; 
+                appearance: none;
+               
+            }
+            
+            #myRange::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none; 
+                height: 1.28rem;
+                width: 16%;
+                background-color: #fff;
+                border-radius: 0%;
+                border:none;
+                
+            }
+
+            #myRange::-moz-range-thumb {
+                height: 1.28rem;
+                width: 16%;
+                background-color: #ffe730;
+                border-radius: 0%;
+                border:none;
+                
             }
         </style>
     </head>
@@ -102,7 +187,7 @@
                         type="range"
                         min="5"
                         max="10"
-                        value="7"
+                        value="8"
                         class="slider"
                         id="myRange"
                     />
@@ -113,10 +198,10 @@
                 <!-- <button class="go">Search</button> -->
             </div>
             <div style="display: none" id="resultwrapper">
-                <h2
+                <!-- <h2
                     style="color: rgb(255, 231, 48); margin: none"
                     id="cityname"
-                ></h2>
+                ></h2> -->
                 <img id="weather-icon" src="icons/0.png" alt="Weather icon" />
                 <div id="weatherntemp">
                     <h1 id="temp"></h1>
@@ -125,6 +210,13 @@
                     <h1 id="weather"></h1>
                 </div>
                 <div id="windnhumi">
+                    
+                    <h2 id="humidity"></h2>
+                    <img
+                        src="icons/drop.png"
+                        alt="Humidity icon"
+                        style="width: 2rem; vertical-align: middle"
+                    />
                     <h2 id="wind"></h2>
                     <img
                         id="windicon"
@@ -136,12 +228,6 @@
                             vertical-align: middle;
                             margin-right: 2rem;
                         "
-                    />
-                    <h2 id="humidity"></h2>
-                    <img
-                        src="icons/drop.png"
-                        alt="Humidity icon"
-                        style="width: 2rem; vertical-align: middle"
                     />
                 </div>
             </div>
@@ -167,8 +253,8 @@ Code Description
 */
         let lastpos = 0;
         let windAnimId = null;
-        let morntime = 7;
-        const cityname = document.querySelector("#cityname");
+        let morntime = 8;
+        //const cityname = document.querySelector("#cityname");
         const searchInput = document.querySelector("#search");
         const go = document.querySelector(".go");
         const wmodict = {
@@ -201,22 +287,28 @@ Code Description
             96: "Thunderstorm With Slight Hail",
             99: "Thunderstorm With Heavy Hail",
         };
-        let lat;
-        let long;
-        let wcode;
-        let percprob;
-        let percsize;
-        let tempfeel;
-        let temp;
-        let vis;
-        let winddir;
-        let windspeed;
-        let humid;
-        let geoapi;
-        let weatherapi;
+        let lat, long, wcode, percprob, percsize, tempfeel, temp, vis, winddir, windspeed, humid, geoapi, weatherapi, lastSearch, pos, target; //tohle jsem delal pred tim nez jsem se dozvedel ze globalni promennou muzu udelat pomoci var
+        let currentUnit = "C";
         // $(".go").click(async function(){
         //     Search();
         // });
+        const tempdisplay = document.querySelector("#temp");
+        const scale = document.querySelector("#scale");
+         const $slider = $("#myRange");
+        $slider.val(7);
+
+        $("#scale").on("click", function () {
+            if (currentUnit === "C") {
+                let tempf = (temp * 9) / 5 + 32;
+                tempdisplay.textContent = `${tempf.toFixed(1)}°`;
+                scale.textContent = "F";
+                currentUnit = "F";
+            } else {
+                tempdisplay.textContent = `${temp}°`;
+                scale.textContent = "C";
+                currentUnit = "C";
+            }
+        });
 
         $(document).on("keydown", function (e) {
             if (e.key === "Enter") {
@@ -224,7 +316,7 @@ Code Description
             }
         });
 
-        $("input").blur(function () {
+        $("#search").blur(function () {
             Search();
         });
 
@@ -232,29 +324,42 @@ Code Description
             $(this).val("");
         });
 
-        $(".slider").on("input", function () {
+        $("#myRange").on("input", function () {
             morntime = Number(this.value);
             console.log(morntime);
+
             const times = ["5AM", "6AM", "7AM", "8AM", "9AM", "10AM"];
             const timeLabelElement = document.querySelector("#time");
             console.log(timeLabelElement);
             timeLabelElement.textContent = times[morntime - 5];
             if (searchInput.value !== "") {
-                Search();
+                getWeather();
             }
         });
+       
         function Search() {
-            console.log(searchInput.value);
-            geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
-            console.log(geoapi);
-            getGeo();
+            
+            if (Boolean(searchInput.value) && searchInput.value !== lastSearch) {
+                console.log(searchInput.value);
+                geoapi = `https://geocoding-api.open-meteo.com/v1/search?name=${searchInput.value}&count=1&language=en&format=json`;
+                console.log(geoapi);
+                getGeo();
+                lastSearch = searchInput.value;
+            }
         }
 
         async function getGeo() {
             const answ = await fetch(geoapi);
             const location = await answ.json();
-            lat = location.results[0].latitude;
-            long = location.results[0].longitude;
+            if(Boolean(location.results)){
+                lat = location.results[0].latitude;
+                long = location.results[0].longitude;
+            }
+            else{
+                alert("Location not found. Please try again.");
+                
+            }
+
             getWeather();
         }
 
@@ -277,6 +382,32 @@ Code Description
     Precipitation Probability: ${percprob}%`);
             Display();
         }
+
+        function animation() {
+                    if (pos === target) {
+                        clearInterval(windAnimId);
+                        windAnimId = null;
+                        lastpos = target;
+                        return;
+                    }
+
+                    if (pos < target && !(target - pos < 180)) {
+                        pos++;
+                    } 
+                    else if (pos > target && !(pos - target < 180)) {
+                            pos--;
+                        }
+                    else if (pos < target && target - pos < 180) {
+                            pos++;
+                        }
+                    else if (pos > target && pos - target < 180) {
+                            pos--;
+                        }
+                    
+                    windicon.style.transform = `rotate(${pos}deg)`;
+                    }
+
+                
 
         function Display() {
             if (wcode == 0) {
@@ -324,76 +455,79 @@ Code Description
             const weather = document.querySelector("#weather");
             const tempdisplay = document.querySelector("#temp");
             const scale = document.querySelector("#scale");
-            tempdisplay.textContent = `${temp}°`;
-            scale.textContent = "C";
-            $(".scale").click(function () {
-                console.log(scale.textContent);
-                if (scale.textContent === "C") {
-                    let tempf = (temp * 9) / 5 + 32;
-                    tempdisplay.textContent = `${tempf.toFixed(1)}°`;
-                    scale.textContent = "F";
-                } else {
-                    tempdisplay.textContent = `${temp}°`;
-                    scale.textContent = "C";
-                }
-            });
+           
             // const diricon = document.querySelector('#windicon');
             // $("#windicon").hover(function(){
 
             // })
             weather.textContent = wmodict[wcode];
-            cityname.textContent =
-                searchInput.value[0].toUpperCase() + searchInput.value.slice(1);
+            //cityname.textContent = searchInput.value[0].toUpperCase() + searchInput.value.slice(1);
             resultwrapper.style.display = "flex";
             const wind = document.querySelector("#wind");
             wind.textContent = `${windspeed} km/h`;
+            let heading;
+            $("#wind").hover(function () {
+                if(winddir > 0 && winddir < 22.5){
+                    windFrom = "Southwest";
+                }
+                if(winddir >= 22.5 && winddir < 67.5){
+                    windFrom = "West";
+                }
+                if(winddir >= 67.5 && winddir < 112.5){
+                    windFrom = "Northwest";
+                }
+                if(winddir >= 112.5 && winddir < 157.5){
+                    windFrom = "North";
+                }
+                if(winddir >= 157.5 && winddir < 202.5){
+                    windFrom = "Northeast";
+                }
+                if(winddir >= 202.5 && winddir < 247.5){
+                    windFrom = "East";
+                }
+                if(winddir >= 247.5 && winddir < 292.5){
+                    windFrom = "Southeast";
+                }
+                if(winddir >= 292.5 && winddir < 337.5){
+                    windFrom = "South";
+                }
+                if(winddir >= 337.5 && winddir <= 360){
+                    windFrom = "Southwest";
+                }
+
+                wind.textContent = `From ${windFrom}`;
+            }, function () {
+                wind.textContent = `${windspeed} km/h`;
+            });
 
             // windicon.style.transform = `rotate(${winddir+720}deg)`;
             Windmove();
             const humidity = document.querySelector("#humidity");
             humidity.textContent = `${humid}%`;
-            // resultwrapper.innerHTML = `
-            // <h2>Weather in ${searchInput.value} at 8 AM</h2>
-            // <img id="weather-icon" src="icons/${wcode}.png" alt="Weather icon">
-            // <p><strong>Condition:</strong> ${wmodict[wcode]}</p>
-            // <p><strong>Temperature:</strong> ${temp}°C (Feels like ${tempfeel}°C)</p>
-            // <p><strong>Precipitation Probability:</strong> ${percprob}%</p>
-            // <p><strong>Precipitation Amount:</strong> ${percsize} mm</p>
-            // <p><strong>Visibility:</strong> ${vis} meters</p>
-            // <p><strong>Wind:</strong> ${windspeed} km/h at ${winddir}°</p>
-            // <p><strong>Humidity:</strong> ${humid}%</p>
-            // `;
+            if (currentUnit === "C") {
+                    tempdisplay.textContent = `${temp}°`;
+                    scale.textContent = "C";
+                } else {
+                    let tempf = (temp * 9) / 5 + 32;
+                    tempdisplay.textContent = `${tempf.toFixed(1)}°`;
+                    scale.textContent = "F";
+                }
+                
             function Windmove() {
                 const windicon = document.querySelector("#windicon");
                 if (!windicon) return;
 
-                const target = winddir;
-                let pos = lastpos;
+                target = winddir;
+                pos = lastpos;
 
                 if (windAnimId !== null) {
                     clearInterval(windAnimId);
                     windAnimId = null;
                 }
 
-                windAnimId = setInterval(() => {
-                    if (pos === target) {
-                        clearInterval(windAnimId);
-                        windAnimId = null;
-                        lastpos = target;
-                        return;
-                    }
-
-                    if (pos < target) {
-                        pos++;
-                    } else {
-                        while (pos > target) {
-                            pos--;
-                        }
-                    }
-
-                    windicon.style.transform = `rotate(${pos}deg)`;
-                }, 3);
+                windAnimId = setInterval(animation, 0.5); //this interval calls the function every 3 msec essentially making an animation 
             }
+
         }
     </script>
 </html>
